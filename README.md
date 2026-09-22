@@ -1,49 +1,262 @@
 # Portable
 
-Portable is a software project workspace prepared for handoffs between Codex,
+Portable is a reusable software-project template for handoffs between Codex,
 Claude Code, Antigravity, and other MCP-capable coding agents.
 
-## Start here
-
-1. Read `AGENTS.md` and `docs/PROJECT_STATE.md`.
-2. Run `./scripts/check.sh` before changing code.
-3. Use one coding agent at a time when the shared MCP memory is enabled.
-4. Run `./scripts/check.sh` again before finishing.
-5. Record every material change and its reason in `docs/CHANGELOG.md`.
-
-## Shared memory
-
-The project uses two complementary forms of memory:
+It combines two forms of project memory:
 
 - Files under `docs/` are the authoritative, reviewable record committed to Git.
-- The local MCP knowledge graph provides convenient cross-session recall.
+- A local MCP knowledge graph provides convenient recall across agents and
+  sessions.
 
-The MCP server stores its local state in `.agent-memory/memory.jsonl`. That file
-is intentionally excluded from Git because it is generated state and may contain
-conversation-derived information. Durable facts and decisions must also be
-written to the appropriate file under `docs/`.
+The instructions below show how to create a project named `reactapp` under
+`/home/dell/Projects`. Replace `reactapp` with your desired project name when
+creating another project.
 
-Project-scoped MCP configuration is provided for:
+You do not need to create `.agent-memory/memory.jsonl` yourself. The MCP server
+creates it automatically the first time an agent writes a memory. If no memory
+has been stored yet, the absence of that file is normal.
 
-- Claude Code: `.mcp.json`
-- Codex: `.codex/config.toml`
-- Antigravity: `.agents/mcp_config.json`
+## 1. Copy the template without generated state
 
-Each client starts the same pinned MCP server through
-`scripts/memory-mcp.sh`. Launch clients from this repository root. The first
-checkout requires one dependency installation:
+```bash
+cd /home/dell/Projects
+
+mkdir reactapp
+
+rsync -a \
+  --exclude='.git/' \
+  --exclude='node_modules/' \
+  --exclude='.agent-memory/memory.jsonl' \
+  portable/ reactapp/
+```
+
+This copies the reusable configuration while excluding:
+
+- The template's Git history
+- Installed npm dependencies
+- The template's local MCP memory
+
+## 2. Enter the new project
+
+```bash
+cd /home/dell/Projects/reactapp
+```
+
+Confirm that the important files exist:
+
+```bash
+ls -la
+ls -la .agent-memory .agents .codex docs scripts
+```
+
+The `.agent-memory` directory already exists because its README is part of the
+template. `memory.jsonl` should not exist yet.
+
+## 3. Rename the npm package
+
+```bash
+npm pkg set name=reactapp
+npm pkg set version=0.1.0
+npm install --package-lock-only
+```
+
+This updates both `package.json` and the root project metadata in
+`package-lock.json`.
+
+## 4. Install the pinned MCP dependency
 
 ```bash
 npm ci
 ```
 
-After that installation, starting the memory server requires no network access.
+This installs the memory server under `node_modules/`. Future MCP launches do
+not need to download it again.
 
-## Verification
+## 5. Customize the project documents
+
+Open the project documents in your preferred editor. For example:
+
+```bash
+nano README.md
+nano docs/PROJECT_STATE.md
+nano docs/CHANGELOG.md
+```
+
+In `docs/PROJECT_STATE.md`, replace the placeholder objective with something
+like:
+
+```markdown
+## Objective
+
+Build a production-ready React application.
+
+## Current status
+
+- Cross-agent workspace initialized.
+- React application has not been scaffolded.
+- Product requirements remain to be defined.
+
+## Architecture
+
+- Frontend: React with TypeScript
+- Build tooling: Vite
+- Test framework: To be selected
+```
+
+Add a new entry at the top of `docs/CHANGELOG.md`:
+
+```markdown
+## YYYY-MM-DD — Reactapp initialization
+
+- Agent/client: Human
+- Change: Created reactapp from the portable cross-agent template.
+- Reason: Establish isolated project memory, agent instructions, and change tracking.
+- Behavior/compatibility impact: No application behavior exists yet.
+- Verification: `./scripts/check.sh`.
+```
+
+Replace `YYYY-MM-DD` with the actual date.
+
+## 6. Initialize Git
+
+```bash
+git init -b main
+```
+
+Verify your Git identity:
+
+```bash
+git config --global --get user.name
+git config --global --get user.email
+```
+
+If either value is empty, configure it:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your-verified-email@example.com"
+```
+
+Use an email address verified by your Git hosting provider. If you use GitHub
+and prefer not to expose your personal email, use the private `noreply` address
+shown under GitHub **Settings → Emails**.
+
+If you need different identities for personal and work repositories, omit
+`--global` and configure the identity inside each repository.
+
+## 7. Run the baseline checks
 
 ```bash
 ./scripts/check.sh
 ```
 
-As the technology stack is added, extend `scripts/check.sh` so this remains the
-single command that runs every required test, lint, typecheck, and build check.
+Expected result:
+
+```text
+All configured project checks passed.
+```
+
+As the project gains application code, extend `scripts/check.sh` so it remains
+the single command that runs every required test, lint, typecheck, and build
+check.
+
+## 8. Create the initial commit
+
+```bash
+git add .
+git commit -m "chore: initialize reactapp workspace" \
+  -m "Create the project from the portable cross-agent template with isolated MCP memory, agent instructions, decision records, and change tracking." \
+  -m "Checks: ./scripts/check.sh"
+```
+
+Optionally tag the clean baseline:
+
+```bash
+git tag baseline-0
+```
+
+## 9. Start the first agent
+
+For Codex:
+
+```bash
+codex
+```
+
+For Claude Code:
+
+```bash
+claude
+```
+
+Approve or trust the project configuration if prompted.
+
+Then give the agent this initial prompt:
+
+```text
+Read AGENTS.md and docs/PROJECT_STATE.md.
+
+Initialize the shared project memory. Create a project entity named
+"reactapp" containing these observations:
+
+- This project was created from the portable cross-agent template.
+- Git-tracked documentation is the authoritative project memory.
+- MCP memory is supplementary.
+- The intended frontend stack is React with TypeScript and Vite.
+- Run ./scripts/check.sh before and after every material change.
+
+Do not modify application code yet. Confirm that the memory can be retrieved.
+```
+
+When the agent calls the MCP memory tool, this file is created automatically:
+
+```text
+/home/dell/Projects/reactapp/.agent-memory/memory.jsonl
+```
+
+Verify that it exists:
+
+```bash
+ls -lh .agent-memory/memory.jsonl
+```
+
+The file remains excluded from Git. It may contain conversation-derived
+information, so do not store credentials, tokens, or other secrets in project
+memory. Durable facts and decisions must also be written to the appropriate
+versioned document under `docs/`.
+
+Use only one memory-enabled coding agent at a time. The underlying MCP memory
+file does not safely support concurrent writers.
+
+## 10. Begin the actual React setup
+
+In the next agent request, use a prompt such as:
+
+```text
+Read the project instructions and shared memory. Scaffold a React TypeScript
+application using Vite in this repository. Preserve the existing cross-agent
+configuration, update the verification script, document the architecture
+decision, run all checks, and update the change ledger.
+```
+
+## Initialization lifecycle
+
+```text
+Copy template
+    ↓
+Install dependencies
+    ↓
+Customize project documents
+    ↓
+Initialize Git and commit baseline
+    ↓
+Launch first agent
+    ↓
+First MCP memory write creates memory.jsonl
+    ↓
+Begin application development
+```
+
+Each project receives its own isolated `memory.jsonl`; you never need to create
+that file manually.

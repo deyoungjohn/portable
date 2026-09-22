@@ -3,6 +3,19 @@
 Record material repository changes in reverse chronological order. Each entry
 must explain the reason and the evidence used to verify the result.
 
+## 2026-09-22 — Human-facing template initialization guide
+
+- Agent/client: Codex
+- Change: Replaced the brief template README with a complete, step-by-step guide
+  for creating a new project from `portable`, using `reactapp` as the example.
+- Reason: Let humans repeat the proven initialization process without reconstructing
+  commands or relying on an earlier agent conversation.
+- Behavior/compatibility impact: No application behavior changed. The guide covers
+  safe template copying, dependency installation, document customization, Git
+  initialization, first memory creation, verification, and the first application
+  setup request.
+- Verification: `./scripts/check.sh`.
+
 ## 2026-09-22 — Workspace bootstrap
 
 - Agent/client: Codex
