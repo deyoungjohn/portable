@@ -15,6 +15,8 @@ required_files=(
   .mcp.json
   .agents/mcp_config.json
   .codex/config.toml
+  opencode.json
+  docs/hermes-mcp.yaml
   scripts/memory-mcp.sh
 )
 
@@ -29,7 +31,7 @@ bash -n scripts/check.sh scripts/memory-mcp.sh
 
 node -e '
   const fs = require("fs");
-  for (const file of [".mcp.json", ".agents/mcp_config.json"]) {
+  for (const file of [".mcp.json", ".agents/mcp_config.json", "opencode.json"]) {
     JSON.parse(fs.readFileSync(file, "utf8"));
   }
 '

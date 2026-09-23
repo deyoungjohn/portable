@@ -1,7 +1,7 @@
 # Portable
 
 Portable is a reusable software-project template for handoffs between Codex,
-Claude Code, Antigravity, and other MCP-capable coding agents.
+Claude Code, Antigravity, OpenCode, Hermes, and other MCP-capable coding agents.
 
 It combines two forms of project memory:
 
@@ -48,6 +48,7 @@ Confirm that the important files exist:
 ```bash
 ls -la
 ls -la .agent-memory .agents .codex docs scripts
+ls -la opencode.json docs/hermes-mcp.yaml
 ```
 
 The `.agent-memory` directory already exists because its README is part of the
@@ -176,7 +177,33 @@ Optionally tag the clean baseline:
 git tag baseline-0
 ```
 
-## 9. Start the first agent
+## 9. Set up Hermes once, if you use it
+
+OpenCode reads `opencode.json` and `AGENTS.md` from each project automatically.
+This configuration targets the installed OpenCode 1.x format. If you later
+upgrade to OpenCode 2.x, move `project-memory` under `mcp.servers` and remove
+the `enabled` field, following the current OpenCode MCP documentation.
+Hermes reads `AGENTS.md` from the project, but its MCP servers are configured in
+`~/.hermes/config.yaml`. To connect Hermes to the memory of whichever portable
+project you open, add the following entry under the existing `mcp_servers:` key
+in that file. The same entry works for future projects copied from this template:
+
+```yaml
+mcp_servers:
+  project-memory:
+    command: bash
+    args: ["scripts/memory-mcp.sh"]
+```
+
+If `mcp_servers:` already exists, add only the indented `project-memory` entry;
+do not add a second `mcp_servers:` key. The same entry is saved in
+`docs/hermes-mcp.yaml` for reference. Start Hermes from the root of the project
+you want it to use; the relative script path then follows that project. Run
+`hermes mcp test project-memory` from that project to check the connection.
+On this machine, the Hermes entry has already been added; future projects only
+need `npm ci` and a launch from their project root.
+
+## 10. Start the first agent
 
 For Codex:
 
@@ -188,6 +215,18 @@ For Claude Code:
 
 ```bash
 claude
+```
+
+For OpenCode:
+
+```bash
+opencode
+```
+
+For Hermes, after the one-time setup above:
+
+```bash
+hermes chat
 ```
 
 Approve or trust the project configuration if prompted.
@@ -226,10 +265,14 @@ information, so do not store credentials, tokens, or other secrets in project
 memory. Durable facts and decisions must also be written to the appropriate
 versioned document under `docs/`.
 
-Use only one memory-enabled coding agent at a time. The underlying MCP memory
-file does not safely support concurrent writers.
+You can work in Codex, close its session, and then open the same project in
+OpenCode or Hermes. Memory remains in the project's `memory.jsonl` file. Wait
+until the first agent has finished its final memory write and its MCP process
+has exited before opening the next. Do not keep two memory-enabled sessions
+open against the same project: the underlying file does not safely support
+concurrent writers.
 
-## 10. Begin the actual React setup
+## 11. Begin the actual React setup
 
 In the next agent request, use a prompt such as:
 

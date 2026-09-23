@@ -3,6 +3,19 @@
 Record material repository changes in reverse chronological order. Each entry
 must explain the reason and the evidence used to verify the result.
 
+## 2026-09-23 — OpenCode and Hermes memory setup
+
+- Agent/client: Codex
+- Change: Added a project MCP configuration for OpenCode and a reusable Hermes
+  MCP entry, with setup and sequential handoff instructions in the README.
+- Reason: Make the template usable with the two agents used frequently by the
+  project owner while keeping each project's memory isolated.
+- Behavior/compatibility impact: OpenCode can connect to project memory after
+  `npm ci`; Hermes uses a one-time entry in its user config that follows the
+  project from which it is launched. The entry was installed on this machine.
+- Verification: `./scripts/check.sh`; `opencode mcp list` connected;
+  `hermes mcp test project-memory` connected and discovered nine tools.
+
 ## 2026-09-22 — Human-facing template initialization guide
 
 - Agent/client: Codex
