@@ -3,6 +3,39 @@
 Record material repository changes in reverse chronological order. Each entry
 must explain the reason and the evidence used to verify the result.
 
+## 2026-09-24 — Stack-agnostic project examples
+
+- Agent/client: Codex
+- Change: Replaced README project-name examples with `newproject`, removed
+  prescribed application technologies, and clarified the distinction between
+  the template's Node.js/npm tooling and the application's chosen stack.
+- Reason: Make initialization and migration instructions usable across stacks
+  while preserving the user's existing README edits.
+- Behavior/compatibility impact: Documentation only; existing memory tooling,
+  commands, and configuration remain unchanged. Application dependencies and
+  verification commands must be supplied for the selected stack.
+- Verification: Baseline and final `./scripts/check.sh`; `git diff --check`;
+  checked removal of old names and stack assumptions and compared against the
+  pre-edit README to verify preservation of the user's initial-memory prompt.
+
+## 2026-09-24 — Existing-project migration and GitHub preparation guide
+
+- Agent/client: Codex
+- Change: Added README walkthroughs for checkpointing an existing project,
+  switching accounts in place, cloning or copying to a destination, restoring
+  ignored MCP memory, verifying a fresh-session handoff, and reviewing a GitHub
+  publication. Added navigation alongside the existing new-project instructions.
+- Reason: Make account and machine handoffs repeatable without losing recorded
+  context or accidentally publishing local memory and credentials.
+- Behavior/compatibility impact: Documentation only; existing initialization,
+  agent configurations, and memory storage behavior remain unchanged. Agent
+  conversation transfer is not guaranteed by the documented migration process.
+- Verification: Baseline and final `./scripts/check.sh`; `git diff --check`;
+  temporary-directory clone/restore and full-copy checks; ignore-rule checks;
+  review of tracked configuration and pattern scan of tracked files and all
+  27 historical file blobs found no obvious credentials. Cross-account login
+  and remote-machine transfer were not performed.
+
 ## 2026-09-23 — OpenCode and Hermes memory setup
 
 - Agent/client: Codex
